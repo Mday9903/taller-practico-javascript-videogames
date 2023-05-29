@@ -4,6 +4,11 @@ const game = canvas.getContext('2d');
 let canvasSize;
 let elementsSize;
 
+const playerPosition = {
+        x: undefined,
+        y: undefined
+}
+
 // Botones
 const btnUp = document.querySelector('#up');
 const btnLeft = document.querySelector('#left');
@@ -14,6 +19,11 @@ const btnDown = document.querySelector('#down');
 window.addEventListener('load',setCanvasSize);
 window.addEventListener('resize',setCanvasSize);
 
+// const minX = -68; 
+// const maxX = canvasSize-25;
+// const minY = 0;
+// const maxY = canvasSize;
+
 // Eventos botones
 
 btnUp.addEventListener('click',moveUp);
@@ -23,27 +33,107 @@ btnDown.addEventListener('click',moveDown);
 
 window.addEventListener('keydown',moveByKeys)
 
-let inicialPosX = elementsSize ;
-let inicialPosY = elementsSize ;
 
 
+function startGame(){
+        game.font = elementsSize*0.9 + 'px Verdana';
+        game.textAlign = 'start';
+    
+        const map = maps[0];
+        console.log(map);
+        const mapRows = map.trim().split('\n');
+        const mapRowsCols = mapRows.map(row => row.trim().split(''));
+        
+        game.clearRect(0,0,canvasSize,canvasSize);
+
+        mapRowsCols.forEach((row,rowIndex) => {
+            row.forEach((col,colIndex) => {
+                    const emoji = emojis[col];
+                    const posX = (elementsSize*colIndex);
+                    const posY = (elementsSize*(rowIndex+1));
+    
+                    if (col == 'O'){
+                            if (!playerPosition.x && !playerPosition.y){
+                                playerPosition.x = posX;
+                                playerPosition.y = posY;
+                                console.log(playerPosition);
+                            }
+                    }
+    
+                    game.fillText(emoji,posX,posY)
+            });
+        });
+    
+        // game.fillText(emojis["PLAYER"], playerPosition.x,playerPosition.y)
+
+        movePlayer();
+      
+       
+    }
+
+// Funcion para crear el canvas y darle el tamaño
+function setCanvasSize(){
+        if (window.innerHeight > window.innerWidth ) {
+                canvasSize = window.innerWidth * 0.8;    
+        } else {
+                canvasSize = window.innerHeight * 0.8;
+        }
+        canvas.setAttribute('width',canvasSize)
+        canvas.setAttribute('height',canvasSize)
+    
+        elementsSize = (canvasSize / 10)*0.97;
+
+        //Declaro los máximos y mínimos que pueden tomar las coordenadas X e Y. Y lo hago sin "CONST" ni "LET" para permitirles ser variables globales.
+        minX = -1; 
+        maxX = canvasSize*0.95;
+        minY = 20;
+        maxY = canvasSize;
+
+        console.log(canvasSize);
+        console.log(elementsSize);
+        startGame()
+}
+
+// Funciones para movimiento del jugador
+function movePlayer(){
+        game.fillText(emojis['PLAYER'],playerPosition.x,playerPosition.y);
+        console.log(playerPosition);
+        console.log(elementsSize);
+}
 
 function moveUp(){
-        // let newPosition = inicialPosY + elementsSize;
-        inicialPosY = inicialPosY + elementsSize;
-        game.fillText(emojis['PLAYER'],inicialPosX,inicialPosY);
-        
-        console.log("Arriba")
-}
+        playerPosition.y -= elementsSize; 
 
+        if (playerPosition.y < minY) {
+                playerPosition.y += elementsSize; 
+        } else {
+                startGame();
+        }
+        
+}
 function moveLeft(){
-        console.log("Izquierda")
+        playerPosition.x -= elementsSize; 
+        if ( playerPosition.x <= minX) {
+                playerPosition.x += elementsSize; 
+        } else {
+                startGame();
+        }
 }
 function moveRight(){
-        console.log("Derecha")
+        playerPosition.x += elementsSize; 
+        if (playerPosition.x >= (maxX)) {
+                playerPosition.x -= elementsSize; 
+        } else {
+                startGame();
+        }
 }
 function moveDown(){
-        console.log("Abajo")
+        playerPosition.y += elementsSize; 
+        if (playerPosition.y > maxY) {
+                playerPosition.y -= elementsSize; 
+        } else {
+                startGame();
+        }
 }
 
 function moveByKeys(event){
@@ -69,56 +159,3 @@ function moveByKeys(event){
 
 
 
-
-
-
-function startGame(){
-    game.font = elementsSize*0.9 + 'px Verdana';
-    game.textAlign = 'start';
-
-    const map = maps[1];
-    console.log(map);
-    const mapRows = map.trim().split('\n');
-    const mapRowsCols = mapRows.map(row => row.trim().split(''));
-//     console.log('mapRows',mapRows);
-//     console.log('mapRowsCols',mapRowsCols);
-
-    mapRowsCols.forEach((row,rowIndex) => {
-        row.forEach((col,colIndex) => {
-                const emoji = emojis[col];
-                const posX = (elementsSize*colIndex);
-                const posY = (elementsSize*(rowIndex+1));
-
-                game.fillText(emoji,posX,posY)
-        });
-    });
-
-//     for (let row = 1; row <= 10; row++) {
-//         for (let col = 1; col <= 10; col++) {
-//                 game.fillText(emojis[mapRowsCols[row - 1][col - 1]],(elementsSize * col)+10,(elementsSize * row)); 
-//         }
-            
-//     }
-    
-    // game.fillRect(0,0,100,100);
-    // game.clearRect(0,0,100,50)
-    // game.fillFont = '25px Verdana';
-    // game.fillStyle = 'purple';
-    // game.textAlign = 'center';
-    // game.fillText('Platzi',25,25)
-}
-
-function setCanvasSize(){
-    if (window.innerHeight > window.innerWidth ) {
-            canvasSize = window.innerWidth * 0.8;    
-    } else {
-            canvasSize = window.innerHeight * 0.8;
-    }
-    canvas.setAttribute('width',canvasSize)
-    canvas.setAttribute('height',canvasSize)
-
-    elementsSize = (canvasSize / 10)*0.97;
-    console.log(canvasSize);
-    console.log(elementsSize);
-    startGame()
-}
