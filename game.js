@@ -1,9 +1,13 @@
 const canvas = document.querySelector('#game');
 // A continuacion creamos un contexto en dos dimensiones:
 const game = canvas.getContext('2d');
+const spanLives = document.querySelector('#lives');
+
+
 let canvasSize;
 let elementsSize;
 let level = 0;
+let lives = 3;
 
 let playerPosition = {
         x: undefined,
@@ -25,11 +29,6 @@ const btnDown = document.querySelector('#down');
 // Eventos windows
 window.addEventListener('load',setCanvasSize);
 window.addEventListener('resize',setCanvasSize);
-
-// const minX = -68; 
-// const maxX = canvasSize-25;
-// const minY = 0;
-// const maxY = canvasSize;
 
 // Eventos botones
 
@@ -76,6 +75,8 @@ function startGame(){
         }
         const mapRows = map.trim().split('\n');
         const mapRowsCols = mapRows.map(row => row.trim().split(''));
+
+        showLives();
 
         enemyPositions = [];    
         game.clearRect(0,0,canvasSize,canvasSize);
@@ -152,16 +153,27 @@ function levelWin(){
 //Creamos la función para el caso de que el jugador pierda al colisionar con una bomba:
 
 function levelLose(){
-        console.log('Choaca');
+        lives --;
+
+        if (lives <= 0) {
+                level = 0;  
+                lives = 3;
+        }
         game.fillText(emojis['BOMB_COLLISION'],playerPosition.x,playerPosition.y);
-        // playerPosition.x = undefined;
-        // playerPosition.y = undefined;
-        // startGame();
+        playerPosition.x = undefined;
+        playerPosition.y = undefined;
+        startGame();
+        
 }
 
 //Creamos la función para el caso de que el jugador gane el juego (termine todos los niveles):
 function gameWin(){
         console.log('Terminaste el juego!')
+}
+
+//Creamos una función para mostrar los corazones en el span "spanLives" representando cada vida restante.
+function showLives(){
+        spanLives.innerHTML = emojis["HEART"].repeat(lives);
 }
 
 function moveUp(){
