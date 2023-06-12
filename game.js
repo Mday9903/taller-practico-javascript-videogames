@@ -2,12 +2,20 @@ const canvas = document.querySelector('#game');
 // A continuacion creamos un contexto en dos dimensiones:
 const game = canvas.getContext('2d');
 const spanLives = document.querySelector('#lives');
+const spanTime = document.querySelector('#time');
 
 
 let canvasSize;
 let elementsSize;
 let level = 0;
 let lives = 3;
+
+//Variables del tiempo (cronómetro):
+let timeStart;
+let timeInterval;
+let timePlayer;
+let timePlayed;
+
 
 let playerPosition = {
         x: undefined,
@@ -73,6 +81,13 @@ function startGame(){
                 gameWin();
                 return
         }
+
+        if(!timeStart){
+                timeStart = Date.now();
+                timeInterval = setInterval(showTime,1000);
+        }
+
+
         const mapRows = map.trim().split('\n');
         const mapRowsCols = mapRows.map(row => row.trim().split(''));
 
@@ -158,6 +173,7 @@ function levelLose(){
         if (lives <= 0) {
                 level = 0;  
                 lives = 3;
+                timeStart = undefined;
         }
         game.fillText(emojis['BOMB_COLLISION'],playerPosition.x,playerPosition.y);
         playerPosition.x = undefined;
@@ -168,12 +184,33 @@ function levelLose(){
 
 //Creamos la función para el caso de que el jugador gane el juego (termine todos los niveles):
 function gameWin(){
-        console.log('Terminaste el juego!')
+        console.log('Terminaste el juego!');
+        clearInterval(timeInterval);
+        timePlayed = Date.now() - timeStart;
+        console.log(timePlayed);
+        //Evaluamos el record conseguido con el record anterior guardado en el navegador
+        if (!localStorage.record){
+                localStorage.record = timePlayed;
+                console.log("Nuevo record!");
+        } else {
+                if(localStorage.record > timePlayed){
+                        console.log("Nuevo record!");
+                        localStorage.record = timePlayed
+                }
+        }
+
+
+
+        // record = Date.now() - timeStart;
 }
 
 //Creamos una función para mostrar los corazones en el span "spanLives" representando cada vida restante.
 function showLives(){
         spanLives.innerHTML = emojis["HEART"].repeat(lives);
+}
+
+function showTime(){
+        spanTime.innerHTML = Date.now() - timeStart;
 }
 
 function moveUp(){
