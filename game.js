@@ -3,6 +3,8 @@ const canvas = document.querySelector('#game');
 const game = canvas.getContext('2d');
 const spanLives = document.querySelector('#lives');
 const spanTime = document.querySelector('#time');
+const spanRecord = document.querySelector('#record');
+const pResult = document.querySelector('#result');
 
 
 let canvasSize;
@@ -65,6 +67,9 @@ function setCanvasSize(){
         minY = 20;
         maxY = canvasSize;
 
+        playerPosition.x = undefined;
+        playerPosition.y = undefined;
+
         
         startGame()
 }
@@ -85,6 +90,7 @@ function startGame(){
         if(!timeStart){
                 timeStart = Date.now();
                 timeInterval = setInterval(showTime,1000);
+                showRecord();
         }
 
 
@@ -186,6 +192,11 @@ function levelLose(){
 function gameWin(){
         console.log('Terminaste el juego!');
         clearInterval(timeInterval);
+        setRecord();
+}
+
+//Creamos una función para evaluar el record de puntuación.
+function setRecord(){
         timePlayed = Date.now() - timeStart;
         console.log(timePlayed);
         //Evaluamos el record conseguido con el record anterior guardado en el navegador
@@ -194,14 +205,12 @@ function gameWin(){
                 console.log("Nuevo record!");
         } else {
                 if(localStorage.record > timePlayed){
-                        console.log("Nuevo record!");
+                        pResult.innerHTML = "Nuevo record!";
                         localStorage.record = timePlayed
+                } else {
+                        pResult.innerHTML = "Lo siento, no superaste el record";
                 }
         }
-
-
-
-        // record = Date.now() - timeStart;
 }
 
 //Creamos una función para mostrar los corazones en el span "spanLives" representando cada vida restante.
@@ -211,6 +220,10 @@ function showLives(){
 
 function showTime(){
         spanTime.innerHTML = Date.now() - timeStart;
+}
+
+function showRecord(){
+        spanRecord.innerHTML = localStorage.getItem('record');
 }
 
 function moveUp(){
