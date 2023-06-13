@@ -11,6 +11,7 @@ let canvasSize;
 let elementsSize;
 let level = 0;
 let lives = 3;
+let won;
 
 //Variables del tiempo (cronómetro):
 let timeStart;
@@ -83,8 +84,14 @@ function startGame(){
         console.log(map);
 
         if (!map){
-                gameWin();
-                return
+                if (!won){
+                        gameWin();
+                        return
+                } else {
+                        location.reload();
+                        return
+                }
+                
         }
 
         if(!timeStart){
@@ -191,8 +198,10 @@ function levelLose(){
 //Creamos la función para el caso de que el jugador gane el juego (termine todos los niveles):
 function gameWin(){
         console.log('Terminaste el juego!');
-        clearInterval(timeInterval);
         setRecord();
+        clearInterval(timeInterval);
+        won = true;
+
 }
 
 //Creamos una función para evaluar el record de puntuación.
@@ -200,18 +209,17 @@ function setRecord(){
         timePlayed = Date.now() - timeStart;
         console.log(timePlayed);
         //Evaluamos el record conseguido con el record anterior guardado en el navegador
-        if (!localStorage.record){
+        if (!localStorage.record || localStorage.record == 0){
                 localStorage.record = timePlayed;
                 console.log("Nuevo record!");
+                pResult.innerHTML = "Nuevo record!";
+        } else if (localStorage.record > timePlayed){
+                pResult.innerHTML = "Nuevo record!";
+                localStorage.record = timePlayed
         } else {
-                if(localStorage.record > timePlayed){
-                        pResult.innerHTML = "Nuevo record!";
-                        localStorage.record = timePlayed
-                } else {
-                        pResult.innerHTML = "Lo siento, no superaste el record";
+                pResult.innerHTML = "Lo siento, no superaste el record";
                 }
         }
-}
 
 //Creamos una función para mostrar los corazones en el span "spanLives" representando cada vida restante.
 function showLives(){
